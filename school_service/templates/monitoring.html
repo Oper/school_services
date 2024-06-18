@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="{{ url_for('static', filename='js/chart.umd.js') }}"></script>
+    <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+    <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
+    <title>Санитарно-эпидемиологическая обстановка в Школе</title>
+</head>
+<body>
+<div class="container-md">
+    <h3 class="text-center">Санитарно-эпидемиологическая обстановка в Школе</h3>
+    <small class="d-inline-flex mb-3 px-2 py-1 fw-semibold text-success-emphasis bg-success-subtle border border-success-subtle rounded-2">{{
+        send_status }}</small>
+    <div class="table-responsive">
+        <table class="table table-bordered border-dark table-sm">
+            <thead>
+            <tr class="table-primary">
+                <th scope="col">#</th>
+                <th scope="col">Класс</th>
+                <th scope="col">Классный руководитель</th>
+                <th scope="col">Количество болеющих</th>
+                <th scope="col">Количество в классе</th>
+                <th scope="col">Процент болеющих</th>
+                <th scope="col">Дата актуализации</th>
+                <th scope="col">Закрыт с:</th>
+                <th scope="col">Закрыт по:</th>
+            </tr>
+            </thead>
+            <tbody class="table-group-divider">
+            {% for j_key, j_value in json_data.items() %}
+            <tr>
+                {% for item in j_value %}
+                <th class="text-center" scope="row">{{ item.id }}</th>
+                <td class="text-center">{{ j_key }}</td>
+                <td>{{ item.man_class }}</td>
+                <td class="text-center">{{ item.count_ill }}</td>
+                <td class="text-center">{{ item.count_class }}</td>
+                <td class="text-center {{ "table-danger" if item.proc_ill > 20 }}">{{ item.proc_ill }}</td>
+                <td class="text-center {{ "table-success" if item.date == date_current else "table-warning" }}">{{ item.date }}</td>
+                <td class="text-center {{ "table-danger" if item.date_closed != None }}">{{ " " if item.date_closed == None else item.date_closed }}</td>
+                <td class="text-center {{ "table-danger" if item.date_closed != None }}">{{ " " if item.date_open == None else item.date_open }}</td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+            </tbody>
+            <tfoot>
+            <tr>
+                <th></th>
+                <td></td>
+                <td class="table-active text-center">Итого:</td>
+                <td class="table-active text-center">{{ count_all_ill }}</td>
+                <td class="table-active text-center">{{ count_all }}</td>
+                <td class="table-active text-center">{{ proc_all }}</td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            </tfoot>
+        </table>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="sendDataModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">Отправить данные по классу</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form class="row g-3 align-items-center" method="post">
+                        <div class="row g-1">
+                            <div class="col">
+                                <div class="form-floating">
+                                    <select class="form-select" id="floatingSelectGridNameClass" name="name_class">
+                                        {% for j_key, j_value in json_data.items() %}
+                                        <option>{{ j_key }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <label for="floatingSelectGridNameClass">Выбор класса</label>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-floating">
+                                    <select class="form-select" id="floatingSelectGridCountIll" name="count_ill">
+                                        <option>0</option>
+                                        <option>1</option>
+                                        <option>2</option>
+                                        <option>3</option>
+                                        <option>4</option>
+                                        <option>5</option>
+                                        <option>6</option>
+                                        <option>7</option>
+                                        <option>8</option>
+                                        <option>9</option>
+                                        <option>10</option>
+                                    </select>
+                                    <label for="floatingSelectGridCountIll">Число болеющих</label>
+                                </div>
+                            </div>
+                            <div class="col align-items-center">
+                                <input class="d-none" type="date" name="date" value={{ date_current }}>
+                                <button type="submit" class="btn btn-primary mb-3">Отправить</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    </br>
+    <div class="container-md">
+        <div class="row">
+            <div class="row">
+                <div class="col-2"></div>
+                <div class="col-6">
+                    {% for cat, msg in get_flashed_messages(True) %}
+                    <div class="alert {{ cat }}" role="alert">
+                        {{ msg }}
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="col-2"></div>
+            </div>
+            <div class="col"></div>
+            <div class="col">
+                <!-- Button trigger modal -->
+                <button type="button" class="btn btn-primary position-fixed bottom-0 end-0 mb-3 me-3 bd-mode-toggle" data-bs-toggle="modal" data-bs-target="#sendDataModal">
+                    Отправить данные по классу
+                </button>
+            </div>
+            <div class="col">
+
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container">
+    <footer class="py-3 my-4">
+        <ul class="nav justify-content-center border-bottom pb-3 mb-3">
+            <li class="nav-item"><a href="../" class="nav-link px-2 text-body-secondary">Главная</a></li>
+            <li class="nav-item"><a href="../monitoring" class="nav-link px-2 text-body-secondary">Мониторинг</a></li>
+            <li class="nav-item"><a href="../admin" class="nav-link px-2 text-body-secondary">Панель управления</a></li>
+            <li class="nav-item"><a href="../analysis" class="nav-link px-2 text-body-secondary">Анализ заболеваемости</a></li>
+        </ul>
+        <p class="text-center text-body-secondary">2024 © МБОУ "Средняя общеобразовательная школа №1" г.Емвы</p>
+    </footer>
+</div>
+</body>
+</html>

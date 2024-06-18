@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="{{ url_for('static', filename='js/chart.js') }}"></script>
+    <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+    <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
+    <title>{{ title }}</title>
+</head>
+<body>
+<div class="container-md">
+    <ul class="nav justify-content-end">
+        <li class="nav-item"><a href="../" class="nav-link px-2 text-body-secondary">Главная</a></li>
+        <li class="nav-item"><a href="../nutrition" class="nav-link px-2 text-body-secondary">Список меню</a></li>
+        <li class="nav-item"><a href="../admin-tehnolog" class="nav-link px-2 text-body-secondary">Панель управления</a>
+        </li>
+    </ul>
+    <h3 class="text-center">{{ title }}</h3>
+    <h5>Список меню за последние 5 дней:</h5>
+    <div class="row row-cols-1 row-cols-md-2 g-6">
+
+        {% for item in menu_list %}
+        <div class="col">
+            <div class="card {{ "border-success" if item == date_todey }}">
+                <div class="card-header strong">
+                    <strong>Ежедневное меню на:</strong>
+                </div>
+                <div class="card-body">
+                    <h4 class="card-title">{{ item if item != date_todey else item.isoformat() + " (Сегодня)" }}</h4>
+                    <p class="card-text">Нажмите на кнопку ниже, чтобы открыть карточку меню</p>
+                    <a href="nutrition/{{ item }}" class="btn btn-primary">Открыть меню</a>
+                </div>
+            </div>
+            <br>
+        </div>
+        {% endfor %}
+
+    </div>
+</div>
+</body>
+</html>
