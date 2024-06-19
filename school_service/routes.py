@@ -15,14 +15,6 @@ from school_service.forms import LoginForm
 loger = getLogger(__name__)
 
 
-def createBD():
-    with app.app_context():
-        #db_sqla.create_all()
-        admin = User('admin')
-        admin.set_password('sosh1emva')
-        db_sqla.session.add(admin)
-        db_sqla.session.commit()
-
 
 @app.before_request
 def before_request():
