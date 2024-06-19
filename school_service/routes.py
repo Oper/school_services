@@ -1,5 +1,4 @@
 import datetime
-import json
 from datetime import date, timedelta
 from logging import getLogger
 from urllib.parse import urlsplit
