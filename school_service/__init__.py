@@ -80,13 +80,13 @@ def sendMail():
                 app.logger.exception(error)
 
         def sending(count_all_ill=0, count_class_closed=0, count_ill_closed=0, count_all_closed=0):
-            server = smtplib.SMTP_SSL('smtp.yandex.ru:465')
-            server.login('your_email', 'password')
+            server = smtplib.SMTP_SSL(app.config['MAIL_SERVER'])
+            server.login(app.config['MAIL_LOGIN'], app.config['MAIL_PASSWORD'])
 
             cure_date = date.today().isoformat()
             cure_time = str(time.localtime().tm_hour).rjust(2, '0') + ':' + str(time.localtime().tm_min).rjust(2, '0')
-            from_addr = 'from_mail'
-            to_addr = 'to_mail'
+            from_addr = app.config['MAIL_FROM']
+            to_addr = app.config['MAIL_TO']
             subject = 'Мониторинг на ' + cure_date + ' время - ' + cure_time + '.'
             body_text = 'Здравствуйте!\nКоличество болеющих обучающихся ВСЕГО: ' + str(
                 count_all_ill) + '\nКоличество классов (групп), закрытых на карантин : ' + str(
