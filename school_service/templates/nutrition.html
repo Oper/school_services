@@ -16,11 +16,15 @@
     </ul>
     <h3 class="text-center">{{ title }}</h3>
     <div class="row">
-        <h4 class="text-center">{{ category_menu_1 }}</h4>
-        {% for j_key, j_value in category_1.items() %}
-        <div class="col-6 table-responsive">
-            <h5>{{ j_key }}</h5>
-            <table class="table table-bordered border-dark table-sm">
+        {% for c_key, c_value in menu.items() %}
+        <h4 class="text-center">{{ c_key }}</h4>
+        <div class="text-success">
+            <hr>
+        </div>
+        {% for t_key, t_value in c_value.items() %}
+        <div class="col-6">
+            <h5>{{ t_key }}</h5>
+            <table class="table table-responsive table-bordered border-dark table-sm">
                 <thead>
                 <tr class="table-primary">
                     <td>Наименование блюда</td>
@@ -30,7 +34,7 @@
                 </tr>
                 </thead>
                 <tbody class="table-group-divider">
-                {% for item in j_value %}
+                {% for item in t_value %}
                 <tr>
                     <td>{{ item.dish_name }}</td>
                     <td>{{ item.out_gramm }}</td>
@@ -42,91 +46,9 @@
             </table>
         </div>
         {% endfor %}
-    </div>
-    <div class="row">
-        <h4 class="text-center">{{ category_menu_2 }}</h4>
-        {% for j_key, j_value in category_2.items() %}
-        <div class="col-6 table-responsive">
-            <h5>{{ j_key }}</h5>
-            <table class="table table-bordered border-dark table-sm">
-                <thead>
-                <tr class="table-primary">
-                    <td>Наименование блюда</td>
-                    <td>Выход, г</td>
-                    <td>Калорийность, ккал</td>
-                    <td>Стоимость, руб</td>
-                </tr>
-                </thead>
-                <tbody class="table-group-divider">
-                {% for item in j_value %}
-                <tr>
-                    <td>{{ item.dish_name }}</td>
-                    <td>{{ item.out_gramm }}</td>
-                    <td>{{ item.calories }}</td>
-                    <td>{{ item.price }}</td>
-                </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-        </div>
         {% endfor %}
     </div>
-    <div class="row">
-        <h4 class="text-center">{{ category_menu_3 }}</h4>
-        {% for j_key, j_value in category_3.items() %}
-        <div class="col-6 table-responsive">
-            <h5>{{ j_key }}</h5>
-            <table class="table table-bordered border-dark table-sm">
-                <thead>
-                <tr class="table-primary">
-                    <td>Наименование блюда</td>
-                    <td>Выход, г</td>
-                    <td>Калорийность, ккал</td>
-                    <td>Стоимость, руб</td>
-                </tr>
-                </thead>
-                <tbody class="table-group-divider">
-                {% for item in j_value %}
-                <tr>
-                    <td>{{ item.dish_name }}</td>
-                    <td>{{ item.out_gramm }}</td>
-                    <td>{{ item.calories }}</td>
-                    <td>{{ item.price }}</td>
-                </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        {% endfor %}
-    </div>
-    <div class="row">
-        <h4 class="text-center">{{ category_menu_4 }}</h4>
-        {% for j_key, j_value in category_4.items() %}
-        <div class="col-6 table-responsive">
-            <h5>{{ j_key }}</h5>
-            <table class="table table-bordered border-dark table-sm">
-                <thead>
-                <tr class="table-primary">
-                    <td>Наименование блюда</td>
-                    <td>Выход, г</td>
-                    <td>Калорийность, ккал</td>
-                    <td>Стоимость, руб</td>
-                </tr>
-                </thead>
-                <tbody class="table-group-divider">
-                {% for item in j_value %}
-                <tr>
-                    <td>{{ item.dish_name }}</td>
-                    <td>{{ item.out_gramm }}</td>
-                    <td>{{ item.calories }}</td>
-                    <td>{{ item.price }}</td>
-                </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        {% endfor %}
-    </div>
+
 </div>
 </body>
 </html>

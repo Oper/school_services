@@ -15,7 +15,6 @@ from school_service.forms import LoginForm
 loger = getLogger(__name__)
 
 
-
 @app.before_request
 def before_request():
     pass
@@ -260,72 +259,29 @@ def nutritions():
 @app.route('/nutrition/<date_menu>')
 def nutrition(date_menu):
     title = 'Меню на ' + str(date_menu)
-    category_1 = {}
-    category_2 = {}
-    category_3 = {}
-    category_4 = {}
+    menu = {}
+
     with app.app_context():
-        tmp = Menu.query.filter(Menu.date_menu == date_menu).order_by(Menu.type.desc()).all()
+        tmp = Menu.query.filter(Menu.date_menu == date_menu).order_by(Menu.category.desc(), Menu.type.desc()).all()
         tmp.reverse()
     if tmp:
         for _ in tmp:
-            match _.category:
-                case '1-4 классы':
-                    with app.app_context():
-                        dish = Dish.query.filter(Dish.id == _.dish_id)
-                    if _.type not in category_1:
-                        category_1[_.type] = []
-                    if dish:
-                        for i in dish:
-                            category_1[_.type].append({
-                                'dish_name': i.title,
-                                'out_gramm': i.out_gramm,
-                                'calories': i.calories,
-                                'price': i.price,
-                            })
-                case 'ОВЗ':
-                    with app.app_context():
-                        dish = Dish.query.filter(Dish.id == _.dish_id)
-                    if _.type not in category_2:
-                        category_2[_.type] = []
-                    if dish:
-                        for i in dish:
-                            category_2[_.type].append({
-                                'dish_name': i.title,
-                                'out_gramm': i.out_gramm,
-                                'calories': i.calories,
-                                'price': i.price,
-                            })
-                case 'СОЦ':
-                    with app.app_context():
-                        dish = Dish.query.filter(Dish.id == _.dish_id)
-                    if _.type not in category_3:
-                        category_3[_.type] = []
-                    if dish:
-                        for i in dish:
-                            category_3[_.type].append({
-                                'dish_name': i.title,
-                                'out_gramm': i.out_gramm,
-                                'calories': i.calories,
-                                'price': i.price,
-                            })
-                case 'Продажа':
-                    with app.app_context():
-                        dish = Dish.query.filter(Dish.id == _.dish_id)
-                    if _.type not in category_4:
-                        category_4[_.type] = []
-                    if dish:
-                        for i in dish:
-                            category_4[_.type].append({
-                                'dish_name': i.title,
-                                'out_gramm': i.out_gramm,
-                                'calories': i.calories,
-                                'price': i.price,
-                            })
+            if _.category not in menu:
+                menu[_.category] = {}
+            if _.type not in menu[_.category]:
+                menu[_.category][_.type] = []
+            with app.app_context():
+                dish = Dish.query.filter(Dish.id == _.dish_id)
+            if dish:
+                for i in dish:
+                    menu[_.category][_.type].append({
+                        'dish_name': i.title,
+                        'out_gramm': i.out_gramm,
+                        'calories': i.calories,
+                        'price': i.price,
+                    })
 
-    return render_template('nutrition.html', title=title, category_1=category_1, category_2=category_2, category_3=category_3, category_4=category_4,
-                           category_menu_1='1-4 классы', category_menu_2='ОВЗ', category_menu_3='СОЦ', category_menu_4='Продажа', type_menu_1='Завтрак',
-                           type_menu_2='Обед')
+    return render_template('nutrition.html', title=title, menu=menu)
 
 
 @app.route('/admin-tehnolog', methods=['POST', 'GET'])
