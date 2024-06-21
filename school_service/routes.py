@@ -367,7 +367,7 @@ def admin_tehnolog():
         })
     with app.app_context():
         tmp_menus = Menu.query.filter(and_(Menu.date_menu >= date_left, Menu.date_menu <= date_right)).order_by(
-            Menu.date_menu.desc(), Menu.type.desc()).all()
+            Menu.date_menu.desc(), Menu.type.desc(), Menu.category.desc()).all()
         tmp_menus.reverse()
     if tmp_menus:
         for _ in tmp_menus:

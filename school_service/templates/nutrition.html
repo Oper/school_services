@@ -15,16 +15,16 @@
         <li class="nav-item"><a href="../nutrition" class="nav-link px-2 text-body-secondary">Список меню</a></li>
     </ul>
     <h3 class="text-center">{{ title }}</h3>
+    <div class="text-success">
+        <hr>
+    </div>
     <div class="row">
         {% for c_key, c_value in menu.items() %}
         <h4 class="text-center">{{ c_key }}</h4>
-        <div class="text-success">
-            <hr>
-        </div>
         {% for t_key, t_value in c_value.items() %}
         <div class="col-6">
-            <h5>{{ t_key }}</h5>
-            <table class="table table-responsive table-bordered border-dark table-sm">
+            <table class="table table-responsive table-bordered border-dark table-sm caption-top">
+                <caption><strong>{{ t_key }}:</strong></caption>
                 <thead>
                 <tr class="table-primary">
                     <td>Наименование блюда</td>
