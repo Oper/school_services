@@ -21,20 +21,24 @@
     <div class="row row-cols-1 row-cols-md-2 g-6">
         {% for item in menu_list %}
         <div class="col">
-            <div class="card {{ "border-success" if item == date_todey }}">
-                <div class="card-header strong">
-                    <strong>Ежедневное меню на:</strong>
-                </div>
-                <div class="card-body">
-                    <h4 class="card-title">{{ item if item != date_todey else item.isoformat() + " (Сегодня)" }}</h4>
-                    <p class="card-text">Нажмите на кнопку ниже, чтобы открыть карточку меню</p>
-                    <a href="nutrition/{{ item }}" class="btn btn-primary">Открыть меню</a>
-                </div>
+            <div class="card {{ " border-success
+            " if item == date_todey }}">
+            <div class="card-header strong">
+                <strong>Ежедневное меню на:</strong>
             </div>
-            <br>
+            <div class="card-body">
+                <h4 class="card-title">{{ item if item != date_todey else item.isoformat() + " (Сегодня)" }}</h4>
+                <p class="card-text">Нажмите на кнопку ниже, чтобы открыть карточку меню</p>
+                <a href="nutrition/{{ item }}" class="btn btn-primary">Открыть меню</a>
+            </div>
         </div>
-        {% endfor %}
+        <br>
     </div>
+    {% endfor %}
+</div>
+<footer class="py-3 my-4">
+    <p class="text-center text-body-secondary">2024 © МБОУ "Средняя общеобразовательная школа №1" г.Емвы</p>
+</footer>
 </div>
 </body>
 </html>

@@ -64,7 +64,7 @@
         </div>
     </div>
     <h5>Список размещенных меню:</h5>
-    <div class="accordion accordion-flush" id="accordionFlushExample">
+    <div class="accordion" id="accordionFlushExample">
         {% for d_key, d_value in menus.items() %}
         <div class="accordion-item">
             <h2 class="accordion-header">
@@ -112,6 +112,7 @@
         </div>
         {% endfor %}
     </div>
+    <br>
     <div class="d-grid gap-2 d-md-flex justify-content-md-end">
         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#menuDataModal">
             Добавить меню
