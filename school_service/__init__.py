@@ -11,6 +11,8 @@ import time
 from datetime import date
 from threading import Thread
 from sqlalchemy import exc
+import telebot
+from telebot import types
 
 from school_service.config import Config
 
@@ -135,5 +137,88 @@ def sendMail():
         time.sleep(60)
 
 
+def start_bot():
+    classes_data = {}
+    with app.app_context():
+        class_list = Class.query.all()
+    name_class_list = []
+    for _ in class_list:
+        name_class_list.append(_.name_class)
+    bot = telebot.TeleBot(app.config['BOT_TOKEN'])
+
+    @bot.message_handler(commands=['start'])
+    def start_message(message):
+        markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+        button_update_main = types.KeyboardButton("Передать данные")
+        markup.add(button_update_main)
+        msg = bot.send_message(message.chat.id, 'Добро пожаловать! Для отправки данных по болеющим, нажмите <Передать данные>', reply_markup=markup)
+        bot.register_next_step_handler(msg, on_start)
+
+    def on_start(message):
+        buttons = []
+        keyboards = types.ReplyKeyboardMarkup(row_width=3)
+        for _ in class_list:
+            buttons.append(types.KeyboardButton(_.name_class))
+        keyboards.add(*buttons)
+        try:
+            chat_id = message.chat.id
+            command = message.text
+            if command != 'Передать данные':
+                raise Exception('Команда не поддерживается!')
+            msg = bot.send_message(message.chat.id, 'Укажите класс', reply_markup=keyboards)
+            bot.register_next_step_handler(msg, set_class_for_update)
+        except Exception as error:
+            app.logger.error(error)
+            bot.reply_to(message, 'Команда не поддерживается!')
+            bot.send_message(chat_id, 'Запустить снова /start')
+
+    def set_class_for_update(message):
+        try:
+            chat_id = message.chat.id
+            name_class = message.text
+            if name_class not in name_class_list:
+                raise Exception('Нет такого класса или не выбран класс')
+            classes_data[chat_id] = name_class
+            keyboards = types.ReplyKeyboardMarkup(row_width=3)
+            buttons_count_ill = [str(_) for _ in range(0, 11)]
+            keyboards.add(*buttons_count_ill)
+            msg = bot.send_message(chat_id, 'Укажите количество болеющих', reply_markup=keyboards)
+            bot.register_next_step_handler(msg, set_count_ill)
+        except Exception as error:
+            bot.reply_to(message, 'Нет такого класса или не выбран класс')
+            app.logger.error(error)
+
+    def update_count_ill(name_class, count_ill):
+        print('Пытаюсь получить Класс из базы')
+        with app.app_context():
+            tmp = Class.query.filter_by(name_class=name_class).first()
+        print('Получил данные по Классу из базы', tmp.name_class)
+        try:
+            tmp.count_ill = int(count_ill)
+            tmp.date = date.today()
+            db_sqla.session.add(tmp)
+            db_sqla.session.commit()
+        except exc as error:
+            db_sqla.session.rollback()
+            app.logger.error(error)
+
+    def set_count_ill(message):
+        try:
+            chat_id = message.chat.id
+            count_ill = message.text
+            name_class = classes_data[chat_id]
+            print(name_class, count_ill)
+            bot.send_message(chat_id, 'Спасибо, данные получены')
+            update_count_ill(name_class, int(count_ill))
+        except Exception as error:
+            db_sqla.session.rollback()
+            bot.reply_to(message, 'Данные не обновлены!')
+            app.logger.error(error)
+
+    bot.infinity_polling(logger_level=logging.DEBUG)
+
+
 thread = Thread(target=sendMail, daemon=True)
 thread.start()
+thread_bot = Thread(target=start_bot, daemon=True)
+thread_bot.start()

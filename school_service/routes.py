@@ -164,8 +164,7 @@ def monitoring():
 
     blocks = Class.query.all()
     json_data = {}
-    count_id = 1
-    for raw in blocks:
+    for count_id, raw in enumerate(blocks, start=1):
         if raw.name_class not in json_data:
             json_data[raw.name_class] = []
         json_data[raw.name_class].append({
@@ -179,7 +178,6 @@ def monitoring():
             'date_open': raw.date_open,
             'date': raw.date
         })
-        count_id += 1
 
     count_all_ill = 0
     count_all = 0
@@ -224,8 +222,7 @@ def analysis():
     for d in tmp:
         labels.append(d.date_send)
         data.append(d.count_all_ill)
-    count_id = 1
-    for i in tmp:
+    for count_id, i in enumerate(tmp, start=1):
         if i.date_send not in json_data:
             json_data[i.date_send] = []
         json_data[i.date_send].append({
@@ -233,7 +230,6 @@ def analysis():
             'count_all_ill': i.count_all_ill,
             'count_class_closed': i.count_class_closed
         })
-        count_id += 1
     return render_template('analysis.html', json_data=json_data, labels=labels, data=data)
 
 
