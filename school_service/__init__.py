@@ -6,7 +6,7 @@ from flask import Flask
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
-import smtplib
+import smtplib, socket
 import time
 from datetime import date
 from threading import Thread
@@ -82,35 +82,37 @@ def sendMail():
                 app.logger.exception(error)
 
         def sending(count_all_ill=0, count_class_closed=0, count_ill_closed=0, count_all_closed=0):
-            server = smtplib.SMTP_SSL(app.config['MAIL_SERVER'])
-            server.login(app.config['MAIL_LOGIN'], app.config['MAIL_PASSWORD'])
-
-            cure_date = date.today().isoformat()
-            cure_time = str(time.localtime().tm_hour).rjust(2, '0') + ':' + str(time.localtime().tm_min).rjust(2, '0')
-            from_addr = app.config['MAIL_FROM']
-            to_addr = app.config['MAIL_TO']
-            subject = 'Мониторинг на ' + cure_date + ' время - ' + cure_time + '.'
-            body_text = 'Здравствуйте!\nКоличество болеющих обучающихся ВСЕГО: ' + str(
-                count_all_ill) + '\nКоличество классов (групп), закрытых на карантин : ' + str(
-                count_class_closed) + '\nКоличество болеющих в закрытых классах (группах): ' + str(
-                count_ill_closed) + '\nКоличество обучающихся всего в закрытых классах (группах): ' + str(
-                count_all_closed)
-
-            letter = "\r\n".join((
-                "From: %s" % from_addr,
-                "To: %s" % to_addr,
-                "Subject: %s" % subject,
-                "",
-                body_text
-            ))
-            letter = letter.encode("UTF-8")
             try:
+                server = smtplib.SMTP_SSL(app.config['MAIL_SERVER'])
+                server.login(app.config['MAIL_LOGIN'], app.config['MAIL_PASSWORD'])
+                cure_date = date.today().isoformat()
+                cure_time = str(time.localtime().tm_hour).rjust(2, '0') + ':' + str(time.localtime().tm_min).rjust(2, '0')
+                from_addr = app.config['MAIL_FROM']
+                to_addr = app.config['MAIL_TO']
+                subject = 'Мониторинг на ' + cure_date + ' время - ' + cure_time + '.'
+                body_text = 'Здравствуйте!\nКоличество болеющих обучающихся ВСЕГО: ' + str(
+                    count_all_ill) + '\nКоличество классов (групп), закрытых на карантин : ' + str(
+                    count_class_closed) + '\nКоличество болеющих в закрытых классах (группах): ' + str(
+                    count_ill_closed) + '\nКоличество обучающихся всего в закрытых классах (группах): ' + str(
+                    count_all_closed)
+
+                letter = "\r\n".join((
+                    "From: %s" % from_addr,
+                    "To: %s" % to_addr,
+                    "Subject: %s" % subject,
+                    "",
+                    body_text
+                ))
+                letter = letter.encode("UTF-8")
                 server.sendmail(from_addr, to_addr, letter)
                 server.quit()
                 return cure_date
-            except:
-                app.logger.error('Error sending email!')
-            return None
+             except socket.error as e:
+                 app.logger.error("Could not connect to yandex.ru")
+             except:
+                 app.logger.error('Other error')
+                 print('Ошибка отправки почты')
+             return None
 
         with app.app_context():
             dbdata_sending = DataSend.query.filter_by(date_send=date_current).first()
