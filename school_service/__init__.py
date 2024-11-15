@@ -121,11 +121,12 @@ def sendMail():
 
         if dbdata_sending is not None and not dbdata_sending.sending and current_time.tm_hour == 9 and (
                 50 < current_time.tm_min < 59) and (0 < current_date < 6):
-            date_sending_email = sending(dbdata_sending.count_all_ill, dbdata_sending.count_class_closed,
+            try:
+                date_sending_email = sending(dbdata_sending.count_all_ill, dbdata_sending.count_class_closed,
                                          dbdata_sending.count_ill_closed,
                                          dbdata_sending.count_all_closed)
-            app.logger.info('The email has been sent' + str(date_sending_email) + '!')
-            try:
+                app.logger.info('The email has been sent' + str(date_sending_email) + '!')
+            
                 with app.app_context():
                     tmp = DataSend.query.filter_by(date_send=date_current).first()
                 tmp.sending = True
@@ -134,6 +135,8 @@ def sendMail():
             except exc.SQLAlchemyError as error_update:
                 db_sqla.session.rollback()
                 app.logger.exception(error_update)
+            except:
+                app.logger.error('Error send mail')
         else:
             app.logger.info('The email has already been sent!')
         time.sleep(60)
